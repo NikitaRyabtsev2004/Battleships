@@ -1,19 +1,16 @@
-import prompt from 'prompt';
 import readlineSync from 'readline-sync';
 
 let boardP1 = [];
 let boardP2 = [];
 let player1ShotsTaken = 0;
 let player2ShotsTaken = 0;
-let player1ShipsRemaining = 5;
-let player2ShipsRemaining = 5;
 let isAgainstBot;
 
 function initBoard(board) {
   for (let row = 0; row < 10; row++) {
     board[row] = [];
     for (let col = 0; col < 10; col++) {
-      board[row][col] = '~';
+      board[row][col] = '\x1b[36m~\x1b[0m';
     }
   }
 }
@@ -25,8 +22,10 @@ function printBoard(board) {
   }
 }
 
+const shipSizes = [];
+
 function placeShips(board) {
-  const shipSizes = [5, 4, 3, 3, 2];
+  
   const positions = [];
 
   for (let i = 0; i < shipSizes.length; i++) {
@@ -51,8 +50,9 @@ function placeShips(board) {
   for (let i = 0; i < positions.length; i++) {
     const row = positions[i][0];
     const col = positions[i][1];
-    board[row][col] = 'O';
+    board[row][col] = '\x1b[90mO\x1b[0m';
   }
+  return shipSizes
 }
 
 function validPosition(row, col, direction, shipSize, positions) {
@@ -81,29 +81,38 @@ function validPosition(row, col, direction, shipSize, positions) {
 }
 
 function takeTurn(board, playerName, shipsRemaining, shotsTaken) {
-  console.log(`${playerName} turn:`);
+  console.log(`\x1b[33m${playerName} turn:\x1b[0m`);
   printBoard(board);
   const guessRow = Number(readlineSync.question(`${playerName}, enter row to shoot (0-9):`));
   const guessCol = Number(readlineSync.question(`${playerName}, enter column to shoot (0-9):`));
-  if (board[guessRow][guessCol] === 'O') {
+  if (board[guessRow][guessCol] === '\x1b[90mO\x1b[0m') {
     console.log('HIT!');
-    board[guessRow][guessCol] = 'X';
+    board[guessRow][guessCol] = '\x1b[31mX\x1b[0m';
     shipsRemaining--;
-  } else if (board[guessRow][guessCol] === 'X') {
+  } else if (board[guessRow][guessCol] === '\x1b[31mX\x1b[0m') {
     console.log('You have already guessed this cell!');
   } else {
     console.log('MISS!');
-    board[guessRow][guessCol] = '+';
+    board[guessRow][guessCol] = '\x1b[32m+\x1b[0m';
   }
   shotsTaken++;
   return shipsRemaining;
 }
 
 function runGame() {
-  console.log('Welcome to Battleship!');
+  console.log('\x1b[31mWelcome to Battleship!');
 
-  const choice = readlineSync.question('Will you play against a human or a bot? (human/bot)');
+  const amountOfShips = readlineSync.question(`\x1b[36mThrough "," whrite how many ships will be on the field,
+  \nbe sure to take into account the condition that the sum 
+  \nof the lengths of the ships should not exceed 40?\x1b[0m`);
+  const pushNums = amountOfShips.split(',').map(Number)
+  shipSizes.push(...pushNums)
+  
+  const choice = readlineSync.question('\x1b[36mWill you play against a human or a bot? (human|bot)\x1b[0m');
   isAgainstBot = choice === 'bot';
+  let numOfShipsRemaining = Number(readlineSync.question(`How many hits need to win? No more then - ${shipSizes}`))
+  let player1ShipsRemaining = numOfShipsRemaining;
+  let player2ShipsRemaining = numOfShipsRemaining;
 
   initBoard(boardP1);
   initBoard(boardP2);
@@ -111,7 +120,7 @@ function runGame() {
   placeShips(boardP1);
   placeShips(boardP2);
 
-  console.log('Player 1 turn to shoot!');
+  console.log('\x1b[33mPlayer 1 turn to shoot!\x1b[0m');
   while (player1ShipsRemaining > 0 && player2ShipsRemaining > 0) {
     player2ShipsRemaining = takeTurn(boardP2, 'Player 1', player2ShipsRemaining, player1ShotsTaken);
     if (player2ShipsRemaining === 0) {
@@ -129,15 +138,15 @@ function runGame() {
       do {
         guessRow = Math.floor(Math.random() * 10);
         guessCol = Math.floor(Math.random() * 10);
-      } while (boardP1[guessRow][guessCol] === '+' || boardP1[guessRow][guessCol] === 'X');
+      } while (boardP1[guessRow][guessCol] === '\x1b[32m+\x1b[0m' || boardP1[guessRow][guessCol] === '\x1b[31mX\x1b[0m');
       console.log(`Bot shoots: ${guessRow}, ${guessCol}`);
-      if (boardP1[guessRow][guessCol] === 'O') {
+      if (boardP1[guessRow][guessCol] === '\x1b[90mO\x1b[0m') {
         console.log('Bot hits!');
-        boardP1[guessRow][guessCol] = 'X';
+        boardP1[guessRow][guessCol] = '\x1b[31mX\x1b[0m';
         player1ShipsRemaining--;
       } else {
         console.log('Bot misses!');
-        boardP1[guessRow][guessCol] = '+';
+        boardP1[guessRow][guessCol] = '\x1b[32m+\x1b[0m';
       }
       player2ShotsTaken++;
       if (player1ShipsRemaining === 0) {
