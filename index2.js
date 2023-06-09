@@ -110,7 +110,14 @@ function runGame() {
   
   const choice = readlineSync.question('\x1b[36mWill you play against a human or a bot? (human|bot)\x1b[0m');
   isAgainstBot = choice === 'bot';
-  let numOfShipsRemaining = Number(readlineSync.question(`How many hits need to win? No more then - ${shipSizes}`))
+  let sum = 0
+  let i5 = 0
+  while (i5 < shipSizes.length) {
+    sum += shipSizes[i5]
+    i5 +=1
+  }
+
+  let numOfShipsRemaining = Number(readlineSync.question(`How many hits need to win? No more then - ${sum}`))
   let player1ShipsRemaining = numOfShipsRemaining;
   let player2ShipsRemaining = numOfShipsRemaining;
 
