@@ -6,7 +6,7 @@ publish:
 	--dry-run
 	
 run:
-	index2.js
+	Battleships.js
 
 lint:
 	npx eslint
