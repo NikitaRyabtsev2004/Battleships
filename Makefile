@@ -1,7 +1,7 @@
 install:
-	-f npm 
 	-g npm @latest
-	
+	-f npm 
+
 publish:
 	--dry-run
 	

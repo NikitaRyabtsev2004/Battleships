@@ -100,7 +100,7 @@ function takeTurn(board, playerName, shipsRemaining, shotsTaken) {
 }
 
 function runGame() {
-  console.log('\x1b[31mWelcome to Battleship!');
+  console.log(`\x1b[31mWelcome to Battleship!\n`);
 
   const amountOfShips = readlineSync.question(`\x1b[36mThrough "," whrite how many ships will be on the field,
   \nbe sure to take into account the condition that the sum 
